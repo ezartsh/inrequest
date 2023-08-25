@@ -1,6 +1,7 @@
 package inrequest
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -19,6 +20,22 @@ func GetFormRequest(r *http.Request) RequestValue {
 		}
 	}
 	return mapValuesOf(forms)
+}
+
+func GetQueryRequest(r *http.Request) RequestValue {
+	var forms []GroupRequestProperty
+	var values = r.URL.Query()
+	for key, value := range values {
+		forms = append(forms, GroupRequestProperty{Path: key, Value: value})
+	}
+	return mapValuesOf(forms)
+}
+
+func GetJsonRequest(r *http.Request) (RequestValue, error) {
+	var result map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&result)
+
+	return result, err
 }
 
 func mapValuesOf(queries []GroupRequestProperty) RequestValue {
