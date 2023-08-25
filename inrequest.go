@@ -2,7 +2,6 @@ package inrequest
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,7 +13,7 @@ func GetFormRequest(r *http.Request) RequestValue {
 
 	if r.MultipartForm != nil {
 		for name, val := range r.MultipartForm.Value {
-			if strings.Contains(name, "[") {
+			if strings.Contains(name, "[") || len(val) == 1 {
 				forms = append(forms, GroupRequestProperty{Path: name, Value: val[0]})
 			} else {
 				for i, sVal := range val {
@@ -33,7 +32,7 @@ func GetQueryRequest(r *http.Request) RequestValue {
 	var forms []GroupRequestProperty
 	var values = r.URL.Query()
 	for key, value := range values {
-		if strings.Contains(key, "[") {
+		if strings.Contains(key, "[") || len(value) == 1 {
 			forms = append(forms, GroupRequestProperty{Path: key, Value: value[0]})
 		} else {
 			for i, sVal := range value {
@@ -54,7 +53,6 @@ func GetJsonRequest(r *http.Request) (RequestValue, error) {
 func mapValuesOf(queries []GroupRequestProperty) RequestValue {
 	maps := make(RequestValue)
 	mapQuery := groupMapKey(queries)
-	fmt.Println(mapQuery)
 	for key, query := range mapQuery {
 		if _, ok := maps[key]; !ok {
 			maps[key] = make(RequestValue)
