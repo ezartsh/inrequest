@@ -20,24 +20,23 @@ Import inrequest to your code:
 import "github.com/ezartsh/inrequest"
 ```
 
-**Basic Usage**
-
-## <a name="Simple-Form-Data">Simple Form Data</a>
-
+**Usage**
 ```go
 package main
 
 import (
 	"net/http"
-	"log"
 	"github.com/ezartsh/inrequest"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-            request := inrequest.GetFormRequest(r)
-	})
-	http.ListenAndServe(":3333", nil)
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        requestQuery := inrequest.GetQueryRequest(r)
+        requestForm := inrequest.GetFormRequest(r)
+        requestJson, err := inrequest.GetJsonRequest(r)
+    	
+        // body request will be automatically transformed into map[string]interface
+    })
 }
 ```
 
