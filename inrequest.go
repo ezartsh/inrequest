@@ -4,17 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 func GetFormRequest(r *http.Request) RequestValue {
 	r.ParseMultipartForm(0)
-	r.ParseForm()
 	var forms []GroupRequestProperty
-	for key, value := range r.Form {
-		forms = append(forms, GroupRequestProperty{Path: key, Value: value})
-	}
+
 	if r.MultipartForm != nil {
+		for name, val := range r.MultipartForm.Value {
+			if strings.Contains(name, "[") {
+				forms = append(forms, GroupRequestProperty{Path: name, Value: val[0]})
+			} else {
+				for i, sVal := range val {
+					forms = append(forms, GroupRequestProperty{Path: name + "[" + strconv.Itoa(i) + "]", Value: sVal})
+				}
+			}
+		}
 		for name := range r.MultipartForm.File {
 			forms = append(forms, GroupRequestProperty{Path: name, Value: r.MultipartForm.File[name][0]})
 		}
@@ -26,7 +33,13 @@ func GetQueryRequest(r *http.Request) RequestValue {
 	var forms []GroupRequestProperty
 	var values = r.URL.Query()
 	for key, value := range values {
-		forms = append(forms, GroupRequestProperty{Path: key, Value: value})
+		if strings.Contains(key, "[") {
+			forms = append(forms, GroupRequestProperty{Path: key, Value: value[0]})
+		} else {
+			for i, sVal := range value {
+				forms = append(forms, GroupRequestProperty{Path: key + "[" + strconv.Itoa(i) + "]", Value: sVal})
+			}
+		}
 	}
 	return mapValuesOf(forms)
 }
