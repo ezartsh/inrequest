@@ -1,4 +1,4 @@
-package inrequest
+package go_inrequest
 
 import (
 	"reflect"

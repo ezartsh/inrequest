@@ -1,4 +1,4 @@
-package inrequest
+package go_inrequest
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func GetFormRequest(r *http.Request) RequestValue {
+func FormData(r *http.Request) formRequest {
 	r.ParseMultipartForm(0)
 	var forms []GroupRequestProperty
 
@@ -25,10 +25,10 @@ func GetFormRequest(r *http.Request) RequestValue {
 			forms = append(forms, GroupRequestProperty{Path: name, Value: r.MultipartForm.File[name][0]})
 		}
 	}
-	return mapValuesOf(forms)
+	return formRequest{result: mapValuesOf(forms)}
 }
 
-func GetQueryRequest(r *http.Request) RequestValue {
+func Query(r *http.Request) queryRequest {
 	var forms []GroupRequestProperty
 	var values = r.URL.Query()
 	for key, value := range values {
@@ -40,14 +40,14 @@ func GetQueryRequest(r *http.Request) RequestValue {
 			}
 		}
 	}
-	return mapValuesOf(forms)
+	return queryRequest{result: mapValuesOf(forms)}
 }
 
-func GetJsonRequest(r *http.Request) (RequestValue, error) {
-	var result map[string]interface{}
+func Json(r *http.Request) (jsonRequest, error) {
+	var result RequestValue
 	err := json.NewDecoder(r.Body).Decode(&result)
 
-	return result, err
+	return jsonRequest{result: result}, err
 }
 
 func mapValuesOf(queries []GroupRequestProperty) RequestValue {

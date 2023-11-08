@@ -1,4 +1,4 @@
-package inrequest
+package go_inrequest
 
 type RequestValue = map[string]interface{}
 
