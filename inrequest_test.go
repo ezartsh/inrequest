@@ -1,4 +1,4 @@
-package go_inrequest
+package inrequest
 
 import (
 	"encoding/json"
