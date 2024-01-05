@@ -24,9 +24,11 @@ import "github.com/ezartsh/inrequest"
 
 **Example Form Data Request**
 
-```http request
-+ first_name: "John"
-+ last_name: "Smith"
+```html
+<form action="some_url">
+  <input type="text" value="John" name="first_name"/>
+  <input type="text" value="Smith" name="last_name"/>
+</form>
 ```
 
 ```go
@@ -59,11 +61,13 @@ func main() {
 <a name="form-request"></a>
 ## 1. Form Data
 
-- **Example Request**
+- **Example 1**
 
-```http request
-+ first_name: "John"
-+ last_name: "Smith"
+```html
+<form action="some_url" method="POST">
+  <input type="text" value="John" name="first_name"/>
+  <input type="text" value="Smith" name="last_name"/>
+</form>
 ```
 
 ```go
@@ -100,20 +104,19 @@ func main() {
 }
 ```
 
-- **Advanced Example Request**
-
-```http request
-+ names: John
-+ names: Mike
-+ numbers[0]: 1
-+ numbers[1]: 2
-+ numbers[3]: 3
-+ attachments[0][title]: Title Attachment 1
-+ attachments[0][description]: Description Attachment 1
-+ attachments[0][file]: (binary)
-+ attachments[1][title]: Title Attachment 2
-+ attachments[1][description]: Description Attachment 2
-+ attachments[1][file]: (binary)
+- **Example 2**
+```html
+<form action="some_url" method="POST" enctype="multipart/form-data">
+  <input type="text" value="John" name="names[0]"/>
+  <input type="text" value="Smith" name="names[1]"/>
+  <input type="text" value="Doe" name="names[2]"/>
+  <input type="text" value="Title Attachment 1" name="attachments[0][title]"/>
+  <textarea value="Description Attachment 1" name="attachments[0][description]"/>
+  <input type="file" value="(binary file)" name="attachments[0][file]"/>
+  <input type="text" value="Title Attachment 2" name="attachments[1][title]"/>
+  <textarea value="Description Attachment 2" name="attachments[1][description]"/>
+  <input type="file" value="(binary file)" name="attachments[1][file]"/>
+</form>
 ```
 
 ```go
@@ -131,57 +134,58 @@ func main() {
 		req := inrequest.FormData(r)
 		
 		if jsonString, err := req.ToJsonString(); err != nil {
-			fmt.Println(jsonString) 
-			// output : 
-			/* {
-			    "names": [
-			        "Jhon",
-			        "Mike"
-			    ],
-			    "numbers": [
-			        "1",
-			        "2",
-			        "3"
-			    ],
-			    "attachments": [
-			        {
-			            "description": "Description Attachment 1",
-			            "file": {
-			                "Filename": "dummy.pdf",
-			                "Header": {
-			                    "Content-Disposition": [
-			                        "form-data; name=\"attachments[0][file]\"; filename=\"dummy.pdf\""
-			                    ],
-			                    "Content-Type": [
-			                        "application/pdf"
-			                    ]
-			                },
-			                "Size": 13264
-			            },
-			            "title": "Title Attachment 1"
-			        },
-			        {
-			            "description": "Description Attachment 2",
-			            "file": {
-			                "Filename": "dummy2.pdf",
-			                "Header": {
-			                    "Content-Disposition": [
-			                        "form-data; name=\"attachments[0][file]\"; filename=\"dummy2.pdf\""
-			                    ],
-			                    "Content-Type": [
-			                        "application/pdf"
-			                    ]
-			                },
-			                "Size": 13264
-			            },
-			            "title": "Title Attachment 2"
-			        }
-			    ]
-			} */
+			// output
+			... 
 		}
 	})
 }
 ```
+#### Example 2 Output
+```json
+// example output 
+{
+	"names": [
+		"Jhon",
+		"Smith"
+		"Doe"
+	],
+	"attachments": [
+		{
+			"title": "Title Attachment 1"
+			"description": "Description Attachment 1",
+			"file": {
+				"Filename": "dummy.pdf",
+				"Header": {
+					"Content-Disposition": [
+						"form-data; name=\"attachments[0][file]\"; filename=\"dummy.pdf\""
+					],
+					"Content-Type": [
+						"application/pdf"
+					]
+				},
+				"Size": 13264
+			},
+		},
+		{
+			"title": "Title Attachment 2"
+			"description": "Description Attachment 2",
+			"file": {
+				"Filename": "dummy2.pdf",
+				"Header": {
+					"Content-Disposition": [
+						"form-data; name=\"attachments[0][file]\"; filename=\"dummy2.pdf\""
+					],
+					"Content-Type": [
+						"application/pdf"
+					]
+				},
+				"Size": 13264
+			},
+		}
+	]
+}
+```
+
 
 <a name="query-string"></a>
 ## 2. Query String
