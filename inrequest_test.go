@@ -2,6 +2,7 @@ package inrequest
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -107,10 +108,10 @@ func TestMappingValues(t *testing.T) {
 
 func TestBindFormRequestToStruct(t *testing.T) {
 	type User struct {
-		Name     string `json:"name"`
-		Position string `json:"position"`
-		Age      int    `json:"age"`
-		Status   bool   `json:"status"`
+		Name     string  `json:"name"`
+		Position string  `json:"position"`
+		Age      float64 `json:"age"`
+		Status   bool    `json:"status"`
 	}
 
 	bindUser := User{}
@@ -118,13 +119,13 @@ func TestBindFormRequestToStruct(t *testing.T) {
 	var source = []GroupRequestProperty{
 		{Path: "name", Value: "John Doe"},
 		{Path: "position", Value: "Fullstack Developer"},
-		{Path: "age", Value: 30},
+		{Path: "age", Value: "12321.312"},
 		{Path: "status", Value: true},
 	}
 	target := User{
 		Name:     "John Doe",
 		Position: "Fullstack Developer",
-		Age:      30,
+		Age:      12321.312,
 		Status:   true,
 	}
 
@@ -135,10 +136,14 @@ func TestBindFormRequestToStruct(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	fmt.Println(string(jsonString))
+
 	err = json.Unmarshal(jsonString, &bindUser)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	fmt.Println("result", bindUser)
 
 	if !reflect.DeepEqual(bindUser, target) {
 		t.Fatalf("Failed bind values to struct %v, %v, got %v", source, target, bindUser)

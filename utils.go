@@ -46,7 +46,7 @@ func fixValueToActualType(target *RequestValue) {
 				fixValueToActualType(&vMap)
 				var arrMap []interface{}
 				keys := make([]int, 0, len(vMap))
-				for key, _ := range vMap {
+				for key := range vMap {
 					if intKey, err := strconv.Atoi(key); err == nil {
 						keys = append(keys, intKey)
 					}
@@ -57,6 +57,26 @@ func fixValueToActualType(target *RequestValue) {
 				}
 				if len(arrMap) > 0 {
 					t[keyT] = arrMap
+				}
+			}
+		} else {
+			if value, ok := v.(string); ok {
+				if floatValue, err := strconv.ParseFloat(value, 64); err == nil {
+					if strings.Contains(value, ".") {
+						t[keyT] = floatValue
+					} else {
+						if intValue, err := strconv.Atoi(value); err == nil {
+							if len([]rune(value)) > 0 && string(value[0]) == "0" {
+								continue
+							}
+							t[keyT] = intValue
+						}
+					}
+				} else if intValue, err := strconv.Atoi(value); err == nil {
+					if len([]rune(value)) > 0 && string(value[0]) == "0" {
+						continue
+					}
+					t[keyT] = intValue
 				}
 			}
 		}
