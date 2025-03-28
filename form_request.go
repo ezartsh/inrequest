@@ -8,15 +8,15 @@ import (
 	"strings"
 )
 
-type formRequest struct {
+type FormRequest struct {
 	result RequestValue
 }
 
-func (r formRequest) ToMap() RequestValue {
+func (r FormRequest) ToMap() RequestValue {
 	return r.result
 }
 
-func (r formRequest) ToBind(model interface{}) error {
+func (r FormRequest) ToBind(model interface{}) error {
 	modelValue := reflect.ValueOf(model)
 	if modelValue.Kind() != reflect.Ptr || modelValue.IsNil() {
 		return errors.New("model must be a non-nil pointer to a struct")
@@ -54,7 +54,7 @@ func (r formRequest) ToBind(model interface{}) error {
 	return nil
 }
 
-func (r formRequest) ToJsonByte() ([]byte, error) {
+func (r FormRequest) ToJsonByte() ([]byte, error) {
 	jsonData, err := json.Marshal(r.result)
 	if err != nil {
 		return []byte{}, err
@@ -62,7 +62,7 @@ func (r formRequest) ToJsonByte() ([]byte, error) {
 	return jsonData, nil
 }
 
-func (r formRequest) ToJsonString() (string, error) {
+func (r FormRequest) ToJsonString() (string, error) {
 	jsonData, err := json.Marshal(r.result)
 	if err != nil {
 		return "", err
