@@ -1,8 +1,11 @@
 package inrequest
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
 	"reflect"
 	"testing"
 )
@@ -136,16 +139,75 @@ func TestBindFormRequestToStruct(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Println(string(jsonString))
-
 	err = json.Unmarshal(jsonString, &bindUser)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	fmt.Println("result", bindUser)
-
 	if !reflect.DeepEqual(bindUser, target) {
 		t.Fatalf("Failed bind values to struct %v, %v, got %v", source, target, bindUser)
+	}
+}
+
+func TestFormData(t *testing.T) {
+	// Create a buffer to hold the multipart form data
+	var body bytes.Buffer
+	type BodyRequest struct {
+		Name string                `json:"name"`
+		File *multipart.FileHeader `json:"file"`
+	}
+	var bodyRequest BodyRequest
+	writer := multipart.NewWriter(&body)
+
+	// Add a form field
+	err := writer.WriteField("name", "test-name")
+	if err != nil {
+		t.Fatalf("Failed to write form field: %v", err)
+	}
+
+	// Add a file field
+	fileField := "file"
+	fileContent := "this is a test file"
+	part, err := writer.CreateFormFile(fileField, "test.txt")
+	if err != nil {
+		t.Fatalf("Failed to create form file: %v", err)
+	}
+	_, err = io.Copy(part, bytes.NewReader([]byte(fileContent)))
+	if err != nil {
+		t.Fatalf("Failed to write file content: %v", err)
+	}
+
+	// Close the writer to finalize the multipart form data
+	writer.Close()
+
+	// Create a new HTTP request with the multipart form data
+	req, err := http.NewRequest("POST", "/upload", &body)
+	if err != nil {
+		t.Fatalf("Failed to create HTTP request: %v", err)
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	// Call the FormData function
+	form := FormData(req)
+	form.ToBind(&bodyRequest)
+
+	// Verify the form fields
+	if bodyRequest.Name != "test-name" {
+		t.Errorf("Expected form field 'name' to be 'test-name', got '%v'", form.result["name"])
+	}
+
+	// Open the file and verify its content
+	file, err := bodyRequest.File.Open()
+	if err != nil {
+		t.Fatalf("Failed to open file: %v", err)
+	}
+	defer file.Close()
+
+	content, err := io.ReadAll(file)
+	if err != nil {
+		t.Fatalf("Failed to read file content: %v", err)
+	}
+	if string(content) != fileContent {
+		t.Errorf("Expected file content to be '%v', got '%v'", fileContent, string(content))
 	}
 }

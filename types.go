@@ -9,3 +9,5 @@ type (
 		Value interface{}
 	}
 )
+
+type CleanFormAction = func()

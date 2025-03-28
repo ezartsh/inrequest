@@ -25,6 +25,7 @@ func FormData(r *http.Request) formRequest {
 			forms = append(forms, GroupRequestProperty{Path: name, Value: r.MultipartForm.File[name][0]})
 		}
 	}
+
 	return formRequest{result: mapValuesOf(forms)}
 }
 
