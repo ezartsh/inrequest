@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func FormData(r *http.Request) formRequest {
+func FormData(r *http.Request) FormRequest {
 	r.ParseMultipartForm(0)
 	var forms []GroupRequestProperty
 
@@ -26,10 +26,10 @@ func FormData(r *http.Request) formRequest {
 		}
 	}
 
-	return formRequest{result: mapValuesOf(forms)}
+	return FormRequest{result: mapValuesOf(forms)}
 }
 
-func Query(r *http.Request) queryRequest {
+func Query(r *http.Request) QueryRequest {
 	var forms []GroupRequestProperty
 	var values = r.URL.Query()
 	for key, value := range values {
@@ -41,14 +41,14 @@ func Query(r *http.Request) queryRequest {
 			}
 		}
 	}
-	return queryRequest{result: mapValuesOf(forms)}
+	return QueryRequest{result: mapValuesOf(forms)}
 }
 
-func Json(r *http.Request) (jsonRequest, error) {
+func Json(r *http.Request) (JsonRequest, error) {
 	var result RequestValue
 	err := json.NewDecoder(r.Body).Decode(&result)
 
-	return jsonRequest{result: result}, err
+	return JsonRequest{result: result}, err
 }
 
 func mapValuesOf(queries []GroupRequestProperty) RequestValue {

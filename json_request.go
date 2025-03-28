@@ -2,15 +2,15 @@ package inrequest
 
 import "encoding/json"
 
-type jsonRequest struct {
+type JsonRequest struct {
 	result RequestValue
 }
 
-func (r jsonRequest) ToMap() RequestValue {
+func (r JsonRequest) ToMap() RequestValue {
 	return r.result
 }
 
-func (r jsonRequest) ToBind(model interface{}) error {
+func (r JsonRequest) ToBind(model interface{}) error {
 	jsonData, err := json.Marshal(r.result)
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func (r jsonRequest) ToBind(model interface{}) error {
 	return nil
 }
 
-func (r jsonRequest) ToByte() ([]byte, error) {
+func (r JsonRequest) ToByte() ([]byte, error) {
 	jsonData, err := json.Marshal(r.result)
 	if err != nil {
 		return []byte{}, err
@@ -29,7 +29,7 @@ func (r jsonRequest) ToByte() ([]byte, error) {
 	return jsonData, nil
 }
 
-func (r jsonRequest) ToString() (string, error) {
+func (r JsonRequest) ToString() (string, error) {
 	jsonData, err := json.Marshal(r.result)
 	if err != nil {
 		return "", err

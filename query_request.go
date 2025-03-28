@@ -2,15 +2,15 @@ package inrequest
 
 import "encoding/json"
 
-type queryRequest struct {
+type QueryRequest struct {
 	result RequestValue
 }
 
-func (r queryRequest) ToMap() RequestValue {
+func (r QueryRequest) ToMap() RequestValue {
 	return r.result
 }
 
-func (r queryRequest) ToBind(model interface{}) error {
+func (r QueryRequest) ToBind(model interface{}) error {
 	jsonData, err := json.Marshal(r.result)
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func (r queryRequest) ToBind(model interface{}) error {
 	return nil
 }
 
-func (r queryRequest) ToJsonByte() ([]byte, error) {
+func (r QueryRequest) ToJsonByte() ([]byte, error) {
 	jsonData, err := json.Marshal(r.result)
 	if err != nil {
 		return []byte{}, err
@@ -29,7 +29,7 @@ func (r queryRequest) ToJsonByte() ([]byte, error) {
 	return jsonData, nil
 }
 
-func (r queryRequest) ToJsonString() (string, error) {
+func (r QueryRequest) ToJsonString() (string, error) {
 	jsonData, err := json.Marshal(r.result)
 	if err != nil {
 		return "", err
