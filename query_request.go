@@ -6,6 +6,9 @@ type QueryRequest struct {
 	result RequestValue
 }
 
+// Ensure QueryRequest implements Request interface
+var _ Request = QueryRequest{}
+
 func (r QueryRequest) ToMap() RequestValue {
 	return r.result
 }
@@ -13,10 +16,10 @@ func (r QueryRequest) ToMap() RequestValue {
 func (r QueryRequest) ToBind(model interface{}) error {
 	jsonData, err := json.Marshal(r.result)
 	if err != nil {
-		return err
+		return NewBindError("", "failed to marshal query data", err)
 	}
-	if err = json.Unmarshal(jsonData, &model); err != nil {
-		return err
+	if err = json.Unmarshal(jsonData, model); err != nil {
+		return NewBindError("", "failed to unmarshal query data", err)
 	}
 	return nil
 }
